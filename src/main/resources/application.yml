@@ -1,0 +1,23 @@
+
+mybatis:
+  configuration:
+    mapUnderscoreToCamelCase: true
+    useGeneratedKeys: true
+  mapper-locations: classpath:mapper/*.xml
+  type-aliases-package: com.adkun.markdown.entity
+
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3306/test?characterEncoding=utf-8&useSSL=false&serverTimeZone=Hongkong
+    username: root
+    password: adkun
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      idle-timeout: 30000
+      maximum-pool-size: 15
+      minimum-idle: 5
+    type: com.zaxxer.hikari.HikariDataSource
+
+adkun:
+  web:
+    path: http://127.0.0.1:5500
