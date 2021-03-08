@@ -1,0 +1,22 @@
+
+main {
+    display: grid;
+    height: 98vh;
+    width: 100%;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr;
+}
+
+.editor {
+    background: black;
+    color: white;
+    caret-color: yellow;
+    
+}
+
+/* .editor-container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    background-color: black;
+} */
