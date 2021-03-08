@@ -64,7 +64,7 @@ public class MdParser {
             String str = mdList.get(i);
             if (" ".equals(str)) {
                 sb.append("<br>");
-            } else if (str.length() > 5 && "<code>".equals(str.substring(0, 6))){
+            } else if (str.length() > 5 && "<code>".equals(str.substring(0, 6))) {
                 sb.append(mdList.get(i));
                 sb.append("<br>");
             } else {
@@ -107,8 +107,13 @@ public class MdParser {
                 }
             } else {
                 // 非代码块
-                tempType.add(OTHER);
-                tempList.add(line);
+                if ("".equals(line)) {
+                    tempType.add(OTHER);
+                    tempList.add(SPACE);
+                } else {
+                    tempType.add(OTHER);
+                    tempList.add(line);
+                }
             }
         }
         tempType.add(OTHER);
@@ -175,7 +180,7 @@ public class MdParser {
                     tempType.add(QUOTE_END);
                 } else if ((line.charAt(0) == '-' && lastLine.charAt(0) != '-' && nextLine.charAt(0) == '-') ||
                         (line.charAt(0) == '+' && lastLine.charAt(0) != '+' && nextLine.charAt(0) == '+') ||
-                        (line.charAt(0) == '*' && lastLine.charAt(0) != '*' && nextLine.charAt(0) == '*')) {
+                        (line.length() > 1 && line.charAt(0) == '*' && line.charAt(1) != '*' && lastLine.charAt(0) != '*' && nextLine.charAt(0) == '*')) {
                     // 进入无序列表
                     tempList.add(SPACE);
                     tempList.add(line);
@@ -191,7 +196,7 @@ public class MdParser {
                     tempType.add(UNORDER_END);
                 } else if ((line.charAt(0) == '-' && lastLine.charAt(0) != '-' && nextLine.charAt(0) != '-') ||
                         (line.charAt(0) == '+' && lastLine.charAt(0) != '+' && nextLine.charAt(0) != '+') ||
-                        (line.charAt(0) == '*' && lastLine.charAt(0) != '*' && nextLine.charAt(0) != '*')) {
+                        (line.length() > 1 && line.charAt(1) != '*' && line.charAt(0) == '*' && lastLine.charAt(0) != '*' && nextLine.charAt(0) != '*')) {
                     // 单行无序列表
                     tempList.add(SPACE);
                     tempList.add(line);
@@ -365,7 +370,7 @@ public class MdParser {
             // 链接
             if (i < line.length() - 3 && ((i > 0 && line.charAt(i) == '[' && line.charAt(i - 1) != '!') || (line.charAt(0) == '['))) {
                 int index1 = line.indexOf(']', i + 1);
-                if (index1 != -1 && line.charAt(index1 + 1) == '(' && line.indexOf(')', index1 + 2) != -1) {
+                if (index1 + 1 < line.length() && index1 != -1 && line.charAt(index1 + 1) == '(' && line.indexOf(')', index1 + 2) != -1) {
                     int index2 = line.indexOf(')', index1 + 2);
                     String linkName = line.substring(i + 1, index1);
                     String linkPath = line.substring(index1 + 2, index2);
@@ -382,14 +387,28 @@ public class MdParser {
             }
             // 粗体
             if (i < line.length() - 2 && line.charAt(i) == '*' && line.charAt(i + 1) == '*') {
-                int index = line.indexOf("**", i + 1);
+                if (i - 6 > -1 && "<code>".equals(line.substring(i - 6, i))) {
+                    // 说明有行内引用
+                    continue;
+                }
+                int index = line.indexOf("**", i);
+                line = line.replaceFirst("\\*\\*", "<strong>");
+                i = i + 8;
+                index = line.indexOf("**", i);
                 if (index != -1) {
-                    String quoteName = line.substring(i + 2, index);
-                    line = line.replace(line.substring(i, index + 2), "<strong>" + quoteName + "</strong>");
+                    String quoteName = line.substring(i, index);
+                    line = line.replaceFirst(quoteName + "\\*\\*", quoteName + "</strong>");
                 }
             }
             // 斜体
             if (i < line.length() - 2 && line.charAt(i) == '*' && line.charAt(i + 1) != '*') {
+                if (i - 6 > -1 && "<code>".equals(line.substring(i - 6, i))) {
+                    // 说明有行内引用
+                    continue;
+                } else if (i - 7 > -1 && "<code>".equals(line.substring(i - 7, i))) {
+                    // 说明有行内引用
+                    continue;
+                }
                 int index = line.indexOf('*', i + 1);
                 if (index != -1 && line.charAt(index + 1) != '*') {
                     String quoteName = line.substring(i + 1, index);

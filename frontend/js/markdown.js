@@ -46,9 +46,9 @@ function sendMd() {
 
 function parseMd(html) {
     let res = html;
+    res = res.replace(/\<div\>\<br\>\<\/div\>/g, "\n");
     res = html.replace(/\<div\>/g, "\n");
     res = res.replace(/\<\/div\>/g, "");
-    res = res.replace(/\<br\>/g, "\n");
     res = res.replace(/\&nbsp;/g, " ");
     return res;
 }
